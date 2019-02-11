@@ -9,17 +9,27 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer, dice;
+var scoreLimit, scores, roundScore, activePlayer, dice, lastDice;
 
 scores = [0, 0];
 roundScore = 0;
 activePlayer = 0;
+scoreLimit = 100;
+
+// allow players to manually set the score limit
+scoreLimit = document.getElementsByName('score-limit').value;
+console.log(scoreLimit);
+
+// make value readonly once game starts
+
+
 
 newGame();
 //document.querySelector('#current-' + activePlayer).textContent = dice;
 //document.querySelector('#current-' + activePlayer).innerHTML = '<em>' + dice + '</em>';
 
 function newGame() {
+  // reset scores in UI, hide dice
   document.querySelector('.dice').style.display = 'none';
   document.getElementById('score-0').textContent = '0';
   document.getElementById('score-1').textContent = '0';
@@ -27,11 +37,29 @@ function newGame() {
   document.getElementById('current-1').textContent = '0';
   document.getElementById('name-0').textContent = 'Player 1';
   document.getElementById('name-1').textContent = 'Player 2';
-  document.querySelector('.player-1-panel').classList.toggle('inactive');
+  // mark active player in UI
+  document.querySelector('.player-0-panel').classList.add('active');
+  document.querySelector('.player-1-panel').classList.remove('active');
+  // blur player 2 panel by default
+  document.querySelector('.player-1-panel').classList.add('inactive');
+  document.querySelector('.player-0-panel').classList.remove('inactive');
+  // reset scores
   scores = [0, 0];
   roundScore = 0;
   activePlayer = 0;
 }
+
+// create DOM var shorthand
+var formDOM = document.querySelector('form');
+
+document.getElementById('start').addEventListener('click', function() {
+    // fade then hide start game screen
+    formDOM.style.opacity = '0';
+    formDOM.addEventListener('transitionend', function() {
+        formDOM.style.display = 'none';
+    })
+});
+
 
 function nextPlayer() {
   activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
@@ -40,19 +68,14 @@ function nextPlayer() {
 
   roundScore = 0;
 
-  if (activePlayer === 0) {
-    document.querySelector('.player-1-panel').classList.add('inactive');
-    document.querySelector('.player-0-panel').classList.remove('inactive');
-  } else {
-    document.querySelector('.player-0-panel').classList.add('inactive');
-    document.querySelector('.player-1-panel').classList.remove('inactive');
-  }
-
   //document.querySelector('.player-0-panel').classList.remove('active');
   //document.querySelector('.player-1-panel').classList.add('active');
   document.querySelector('.player-0-panel').classList.toggle('active');
   document.querySelector('.player-1-panel').classList.toggle('active');
+  document.querySelector('.player-0-panel').classList.toggle('inactive');
+  document.querySelector('.player-1-panel').classList.toggle('inactive');
 }
+
 
 document.querySelector('.btn-roll').addEventListener('click', function(){
   // 1. random number
@@ -71,8 +94,16 @@ document.querySelector('.btn-roll').addEventListener('click', function(){
   } else {
     // Next player
     nextPlayer();
-    diceDOM.style.display = 'none';
   }
+
+  // 4. update the score IF the player didn't roll two 6's in a row
+  if (dice === 6 && lastDice === 6) {
+    // player loses current and global score
+    scores[activePlayer] = 0;
+    document.querySelector('#score-' + activePlayer).textContent = '0';
+    nextPlayer();
+  }
+  lastDice = dice;
 });
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
@@ -83,7 +114,7 @@ document.querySelector('.btn-hold').addEventListener('click', function() {
   document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
 
   // check if player won the game
-  if (scores[activePlayer] >= 100) {
+  if (scores[activePlayer] >= scoreLimit) {
     document.querySelector('#name-' +  activePlayer).textContent = 'WINNER!';
     document.querySelector('.dice').style.display = 'none';
     document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
