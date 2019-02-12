@@ -9,20 +9,35 @@ GAME RULES:
 
 */
 
-var scoreLimit, scores, roundScore, activePlayer, dice, lastDice;
+var scoreLimit, scores, roundScore, activePlayer, dice, lastDice, player0Input, player1Input;
 
 scores = [0, 0];
 roundScore = 0;
 activePlayer = 0;
 scoreLimit = 100;
 
-// allow players to manually set the score limit
-scoreLimit = document.getElementsByName('score-limit').value;
-console.log(scoreLimit);
+// TODO: clear input field text on load
 
-// make value readonly once game starts
+// get name text field inputs
+player0Input = document.getElementById('player-0-input').value;
+player1Input = document.getElementById('player-1-input').value;
 
+// create DOM var shorthand
+var formDOM = document.querySelector('form');
 
+document.getElementById('start').addEventListener('click', function() {
+    // fade then hide start game screen
+    formDOM.style.opacity = '0';
+    formDOM.addEventListener('transitionend', function() {
+        formDOM.style.display = 'none';
+    });
+    // display name text field inputs as names
+    document.getElementById('name-0').textContent = player0Input;
+    document.getElementById('name-1').textContent = player1Input;
+    // allow players to manually set the score limit
+    scoreLimit = document.getElementById('score-limit').value;
+    document.getElementById('final-score').textContent = scoreLimit;
+});
 
 newGame();
 //document.querySelector('#current-' + activePlayer).textContent = dice;
@@ -35,8 +50,8 @@ function newGame() {
   document.getElementById('score-1').textContent = '0';
   document.getElementById('current-0').textContent = '0';
   document.getElementById('current-1').textContent = '0';
-  document.getElementById('name-0').textContent = 'Player 1';
-  document.getElementById('name-1').textContent = 'Player 2';
+  //document.getElementById('name-0').textContent = 'Player 1';
+  //document.getElementById('name-1').textContent = 'Player 2';
   // mark active player in UI
   document.querySelector('.player-0-panel').classList.add('active');
   document.querySelector('.player-1-panel').classList.remove('active');
@@ -49,18 +64,6 @@ function newGame() {
   activePlayer = 0;
 }
 
-// create DOM var shorthand
-var formDOM = document.querySelector('form');
-
-document.getElementById('start').addEventListener('click', function() {
-    // fade then hide start game screen
-    formDOM.style.opacity = '0';
-    formDOM.addEventListener('transitionend', function() {
-        formDOM.style.display = 'none';
-    })
-});
-
-
 function nextPlayer() {
   activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
   document.getElementById('current-0').textContent = '0';
@@ -68,8 +71,6 @@ function nextPlayer() {
 
   roundScore = 0;
 
-  //document.querySelector('.player-0-panel').classList.remove('active');
-  //document.querySelector('.player-1-panel').classList.add('active');
   document.querySelector('.player-0-panel').classList.toggle('active');
   document.querySelector('.player-1-panel').classList.toggle('active');
   document.querySelector('.player-0-panel').classList.toggle('inactive');
