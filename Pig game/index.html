@@ -34,20 +34,21 @@
             <button class="btn-hold"><i class="ion-ios-download-outline"></i>Hold</button>
 
             <div class="score">
-                <p>Final score</p>
-                <p id="final-score">Score</p>
+                <p>Score limit</p>
+                <p id="final-score">100</p>
             </div>
 
             <img src="dice-5.png" alt="Dice" class="dice">
         </div>
+
         <form>
             Set score limit<br />
-            <input type="text" name="score-limit" value="100" placeholder="100"><br />
+            <input id="score-limit" type="text" value="100" placeholder="100"><br />
             Set Player 1 name<br />
-            <input type="text" name="Player 1 name" value="" placeholder="Player 1"><br />
+            <input id="player-0-input" type="text" value="" placeholder="Player 1"><br />
             Set player 2 name<br />
-            <input type="text" name="Player 2 name" value="" placeholder="Player 2"><br />
-            <button id="start" type="button" name="Start">Start!</button>
+            <input id="player-1-input" type="text" value="" placeholder="Player 2"><br />
+            <button id="start" type="button" name="Start">Play!</button>
         </form>
 
         <script src="app.js"></script>
