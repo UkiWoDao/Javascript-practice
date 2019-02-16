@@ -42,13 +42,17 @@
         </div>
 
         <form>
-            Set score limit<br />
-            <input id="score-limit" type="text" value="100" placeholder="100"><br />
-            Set Player 1 name<br />
-            <input id="player-0-input" type="text" value="" placeholder="Player 1"><br />
-            Set player 2 name<br />
-            <input id="player-1-input" type="text" value="" placeholder="Player 2"><br />
-            <button id="start" type="button" name="Start">Play!</button>
+            <div class="flex">
+                <p>Set Player 1 name</p>
+                <input id="player-0-input" type="text" value="" placeholder="Player 1"><br />
+                <p>Set player 2 name</p>
+                <input id="player-1-input" type="text" value="" placeholder="Player 2"><br />
+            </div>
+            <div class="set-score">
+                <p>Set score limit</p>
+                <input id="score-limit" type="text" value="100" placeholder="100"><br />
+                <button id="play" type="button" name="Start">Play!</button>
+            </div>
         </form>
 
         <script src="app.js"></script>
