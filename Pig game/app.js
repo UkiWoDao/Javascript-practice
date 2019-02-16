@@ -9,6 +9,10 @@ GAME RULES:
 
 */
 
+// TODO: clear input field text on load
+// TODO: if input empty give generic player names
+// FIXME: score limit input fails if player names is empty
+
 var scoreLimit, scores, roundScore, activePlayer, dice, lastDice, player0Input, player1Input;
 
 scores = [0, 0];
@@ -16,27 +20,35 @@ roundScore = 0;
 activePlayer = 0;
 scoreLimit = 100;
 
-// TODO: clear input field text on load
-
-// get name text field inputs
-player0Input = document.getElementById('player-0-input').value;
-player1Input = document.getElementById('player-1-input').value;
-
 // create DOM var shorthand
 var formDOM = document.querySelector('form');
 
-document.getElementById('start').addEventListener('click', function() {
+document.getElementById('play').addEventListener('click', function() {
     // fade then hide start game screen
     formDOM.style.opacity = '0';
     formDOM.addEventListener('transitionend', function() {
         formDOM.style.display = 'none';
     });
-    // display name text field inputs as names
-    document.getElementById('name-0').textContent = player0Input;
-    document.getElementById('name-1').textContent = player1Input;
-    // allow players to manually set the score limit
+    // get name text field inputs
+     player0Input = document.getElementById('player-0-input').value;
+     player1Input = document.getElementById('player-1-input').value;
+
+    // give generic name if player name input empty, otherwise display name text field inputs as names
+    player0Input.length == 0
+    ? document.getElementById('name-0').textContent = 'Player 1'
+    : document.getElementById('name-0').textContent = player0Input;
+
+    player1Input.length == 0
+    ? document.getElementById('name-1').textContent = 'Player 2'
+    : document.getElementById('name-1').textContent = player1Input;
+
+    // allow players to manually set the score limit, if input empty score is 100
     scoreLimit = document.getElementById('score-limit').value;
-    document.getElementById('final-score').textContent = scoreLimit;
+    scoreLimit == 0
+    ? document.getElementById('final-score').textContent = '100'
+    : document.getElementById('final-score').textContent = scoreLimit;
+
+    //document.querySelector('.wrapper').style.filter = 'blur(0px)'; performance issues
 });
 
 newGame();
@@ -50,18 +62,32 @@ function newGame() {
   document.getElementById('score-1').textContent = '0';
   document.getElementById('current-0').textContent = '0';
   document.getElementById('current-1').textContent = '0';
-  //document.getElementById('name-0').textContent = 'Player 1';
-  //document.getElementById('name-1').textContent = 'Player 2';
+
   // mark active player in UI
   document.querySelector('.player-0-panel').classList.add('active');
   document.querySelector('.player-1-panel').classList.remove('active');
+
   // blur player 2 panel by default
   document.querySelector('.player-1-panel').classList.add('inactive');
   document.querySelector('.player-0-panel').classList.remove('inactive');
+
   // reset scores
   scores = [0, 0];
   roundScore = 0;
   activePlayer = 0;
+
+  // remove WINNER text
+  if (document.querySelector('#name-0').textContent == 'WINNER!'
+  || document.querySelector('#name-1').textContent == 'WINNER!') {
+    document.querySelector('#name-0').textContent = player0Input;
+    document.querySelector('.player-0-panel').classList.remove('winner');
+    document.querySelector('#name-1').textContent = player1Input;
+    document.querySelector('.player-1-panel').classList.remove('winner');
+  }
+
+  // make buttons visible again
+  document.querySelector('.btn-roll').style.display = 'block';
+  document.querySelector('.btn-hold').style.display = 'block';
 }
 
 function nextPlayer() {
