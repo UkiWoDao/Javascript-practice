@@ -1,0 +1,243 @@
+/*********************************************/
+/************** G E N E R A L ****************/
+/*********************************************/
+
+/* TODO: make play button snazzy */
+/* TODO: wrapper display none, frosted glass effect on starting screen */
+
+/* color scheme:
+#199673;
+#5b3960;*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+body {
+    background-image: linear-gradient(rgba(62, 20, 20, 0.1), rgba(62, 20, 20, 0.4)), url(1.jpeg);
+    /* photograph by Lucas Ettore Chiereguini from pexels */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: Lato;
+    font-weight: 300;
+    position: relative;
+    height: 100vh;
+    color: #e6e6e6;
+}
+
+.wrapper {
+    width: 1000px;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.player-0-panel,
+.player-1-panel {
+    width: 50%;
+    float: left;
+    height: 600px;
+    padding: 100px;
+    transition: 0.2s;
+}
+
+
+/*******************************************/
+/*************** PLAYERS *******************/
+/*******************************************/
+
+.player-name {
+    font-size: 40px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 100;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.player-score {
+    text-align: center;
+    font-size: 80px;
+    font-weight: 300;
+    color: #5b3960;
+    margin-bottom: 130px;
+}
+
+.active {
+    background-color: rgba(255, 255, 255, 0.4); }
+.active .player-name { font-weight: 300; }
+
+/* .inactive {
+    filter: blur(0.5px);
+} */
+
+.active .player-name::after {
+    content: "\2022";
+    font-size: 47px;
+    position: absolute;
+    color: #5b3960;
+    top: -7px;
+    right: 10px;
+}
+
+.player-current-box {
+    background-color: #5b3960;
+    width: 40%;
+    margin: 0 auto;
+    padding: 12px;
+    text-align: center;
+}
+
+.player-current-label {
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: white;
+}
+
+.player-current-score {
+    font-size: 30px;
+}
+
+button {
+    position: absolute;
+    width: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #e6e6e6;
+    background: none;
+    border: none;
+    font-family: Lato;
+    font-size: 20px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 300;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button:hover { font-weight: 600; }
+button:hover i { margin-right: 20px; }
+
+button:focus {
+    outline: none;
+}
+
+
+/*****************************************/
+/******** S T A R T  P R O M P T *********/
+/*****************************************/
+
+form {
+  display: none;
+    background-color: rgb(0, 0, 0, 0.8);
+    color: white;
+    font-size: 1.3rem;
+    text-align: center;
+    height: 30vh;
+    min-height: 210px;
+    width: 50vw;
+    min-width: 550px;
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    transform: translateX(-50%);
+    text-transform: uppercase;
+    transition: 0.3s ease-out;
+}
+
+form input {
+    text-align: center;
+    width: 6vw;
+}
+
+.flex {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 30px;
+}
+
+.set-score {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 45%;
+}
+
+.set-score input{
+    font-size: 1rem;
+    width: 5vw;
+}
+
+#play {
+    font-weight: 700;
+    margin-top: 20px;
+    color: #f7f7f7;
+    padding: 20px;
+    background-color: #199673;
+    transition: 0.3s ease-out;
+}
+
+
+/***********************************/
+/********** B U T T O N S **********/
+/***********************************/
+
+i {
+    color: #30aab5;
+    display: inline-block;
+    margin-right: 15px;
+    font-size: 32px;
+    line-height: 1;
+    vertical-align: text-top;
+    margin-top: -4px;
+    transition: margin 0.3s;
+    text-shadow: 0px 0px 2px black;
+}
+
+.btn-new { top: 60px;}
+.btn-roll { top: 403px;}
+.btn-hold { top: 467px;}
+
+.score {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 20px;
+}
+
+#final-score {
+    background-color: rgba(25, 150, 115, 0.3);
+    border: 1px solid #2d1d30;
+    box-shadow: 0px 0px 2px black;
+    text-shadow: 2px 2px 2px black;
+}
+
+.dice {
+    position: absolute;
+    left: 50%;
+    top: 178px;
+    transform: translateX(-50%);
+    height: 100px;
+    box-shadow: 0px 5px 20px rgba(25, 150, 115, 0.9);
+}
+
+.winner { background-color: #f7f7f7; }
+.winner .player-name { font-weight: 300; color: #729963; }
