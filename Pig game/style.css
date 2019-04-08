@@ -2,6 +2,20 @@
 /************** G E N E R A L ****************/
 /*********************************************/
 
+/* TODO: make play button snazzy */
+/* TODO: wrapper display none, frosted glass effect on starting screen */
+
+/* color scheme:
+#199673;
+#5b3960;*/
+
+:root { 
+    --primary-color: #5b3960;
+    --secondary-color: #199673;
+    --dirty-white: #e6e6e6;
+    --turquoise: #30aab5;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -15,26 +29,32 @@
 }
 
 body {
-    background-image: linear-gradient(rgba(62, 20, 20, 0.4), rgba(62, 20, 20, 0.4)), url(back1.jpg);
+    background-image: linear-gradient(rgba(62, 20, 20, 0.1), rgba(62, 20, 20, 0.4)), url(1.jpeg);
+    /* photograph by Lucas Ettore Chiereguini from pexels */
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     font-family: Lato;
     font-weight: 300;
     position: relative;
     height: 100vh;
-    color: #555;
+    color: var(--dirty-white);
 }
 
 .wrapper {
     width: 1000px;
-    position: absolute;
+    position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #fff;
-    box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
     overflow: hidden;
-    /*filter: blur(2px);*/ /* NOTE: performance issues */
+    border-radius: 3px;
+}
+
+.blur {
+    filter: blur(10px);
 }
 
 .player-0-panel,
@@ -65,30 +85,30 @@ body {
 .player-score {
     text-align: center;
     font-size: 80px;
-    font-weight: 100;
-    color: #EB4D4D;
+    font-weight: 300;
+    color: var(--light-violet);
     margin-bottom: 130px;
 }
 
-.active { background-color: #f7f7f7; }
+.active {
+    background-color: rgba(255, 255, 255, 0.4); }
 .active .player-name { font-weight: 300; }
 
-.inactive {
+/* .inactive {
     filter: blur(0.5px);
-}
+} */
 
 .active .player-name::after {
     content: "\2022";
     font-size: 47px;
     position: absolute;
-    color: #EB4D4D;
+    color: var(--light-violet);
     top: -7px;
     right: 10px;
 }
 
 .player-current-box {
-    background-color: #EB4D4D;
-    color: #fff;
+    background-color: var(--light-violet);
     width: 40%;
     margin: 0 auto;
     padding: 12px;
@@ -99,7 +119,7 @@ body {
     text-transform: uppercase;
     margin-bottom: 10px;
     font-size: 12px;
-    color: #222;
+    color: white;
 }
 
 .player-current-score {
@@ -111,7 +131,7 @@ button {
     width: 200px;
     left: 50%;
     transform: translateX(-50%);
-    color: #555;
+    color: var(--dirty-white);
     background: none;
     border: none;
     font-family: Lato;
@@ -139,13 +159,11 @@ form {
     color: white;
     font-size: 1.3rem;
     text-align: center;
-    height: 30vh;
-    min-height: 210px;
-    width: 50vw;
-    min-width: 550px;
+    height: 300px;
+    width: 600px;
     position: absolute;
     left: 50%;
-    top: 20%;
+    top: 30%;
     transform: translateX(-50%);
     text-transform: uppercase;
     transition: 0.3s ease-out;
@@ -154,6 +172,7 @@ form {
 form input {
     text-align: center;
     width: 6vw;
+    border-radius: 3px;
 }
 
 .flex {
@@ -166,7 +185,7 @@ form input {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 45%;
+    bottom: 25%;
 }
 
 .set-score input{
@@ -175,12 +194,37 @@ form input {
 }
 
 #play {
+    cursor: pointer;
+    font-size: 2rem;
     font-weight: 700;
-    margin-top: 20px;
-    color: #f7f7f7;
-    padding: 20px;
-    background-color: #EB4D4D;
+    margin-top: 30px;
+    background-color: var(--sea-green);
     transition: 0.3s ease-out;
+    animation: neonGlow 2s infinite alternate cubic-bezier(0.455, 0.030, 0.515, 0.955);;
+}
+
+@keyframes neonGlow {
+  0% {
+    text-shadow: 0 0 10px rgba(255,255,255,.8),
+                 0 0 20px rgba(255,255,255,.8),
+                 0 0 22px  rgba(255,255,255,.8),
+                 0 0 40px  rgba(146, 66, 220, 0.8),
+                 0 0 60px  rgba(146, 66, 220, 0.8),
+                 0 0 80px  rgba(146, 66, 220,.5),
+                 0 0 100px rgba(146, 66, 220,.5),
+                 0 0 140px rgba(146, 66, 220,.5),
+                 0 0 200px rgba(146, 66, 220,.5);
+  }
+  100% {
+    text-shadow: 0 0 2px rgba(255,255,255,.8),
+                 0 0 8px rgba(255,255,255,.8),
+                 0 0 10px rgba(255,255,255,.8),
+                 0 0 20px rgba(146, 66, 220,.8),
+                 0 0 30px rgba(146, 66, 220,.8),
+                 0 0 40px rgba(146, 66, 220,.8),
+                 0 0 50px rgba(146, 66, 220,.5),
+                 0 0 80px rgba(146, 66, 220,.5);
+  }
 }
 
 
@@ -189,7 +233,7 @@ form input {
 /***********************************/
 
 i {
-    color: #EB4D4D;
+    color: var(--turquoise);
     display: inline-block;
     margin-right: 15px;
     font-size: 32px;
@@ -197,6 +241,7 @@ i {
     vertical-align: text-top;
     margin-top: -4px;
     transition: margin 0.3s;
+    text-shadow: 0px 0px 2px black;
 }
 
 .btn-new { top: 60px;}
@@ -214,7 +259,10 @@ i {
 }
 
 #final-score {
-    border: 1px solid #EB4D4D;
+    background-color: rgba(25, 150, 115, 0.3);
+    border: 1px solid #2d1d30;
+    box-shadow: 0px 0px 2px black;
+    text-shadow: 2px 2px 2px black;
 }
 
 .dice {
@@ -223,8 +271,29 @@ i {
     top: 178px;
     transform: translateX(-50%);
     height: 100px;
-    box-shadow: 0px 10px 60px rgba(0, 0, 0, 0.10);
+    box-shadow: 0px 5px 20px rgba(25, 150, 115, 0.9);
 }
 
 .winner { background-color: #f7f7f7; }
-.winner .player-name { font-weight: 300; color: #EB4D4D; }
+.winner .player-name { font-weight: 300; color: #729963; }
+
+
+/*********** RESPONSIVE ************/
+
+@media only screen and (max-width: 700px) {
+    form {
+        width: 400px;
+    }
+}
+
+@media only screen and (max-height: 700px) {
+    form {
+        height: 200px;
+    }
+    .flex {
+        padding-top: 10px;
+    }
+    .set-score {
+        bottom: 10%;
+    }
+}
