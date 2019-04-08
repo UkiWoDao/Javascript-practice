@@ -1,17 +1,4 @@
-/*
-GAME RULES:
-
-- The game has 2 players, playing in rounds
-- In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
-- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
-- The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
-- The first player to reach 100 points on GLOBAL score wins the game
-
-*/
-
 // TODO: clear input field text on load
-// TODO: if input empty give generic player names
-// FIXME: score limit input fails if player names is empty
 
 var scoreLimit, scores, roundScore, activePlayer, dice, lastDice, player0Input, player1Input;
 
@@ -24,11 +11,15 @@ scoreLimit = 100;
 var formDOM = document.querySelector('form');
 
 document.getElementById('play').addEventListener('click', function() {
+    // unblur background
+    document.querySelector('.wrapper').classList.remove('blur');
+
     // fade then hide start game screen
     formDOM.style.opacity = '0';
     formDOM.addEventListener('transitionend', function() {
         formDOM.style.display = 'none';
     });
+
     // get name text field inputs
      player0Input = document.getElementById('player-0-input').value;
      player1Input = document.getElementById('player-1-input').value;
@@ -47,8 +38,6 @@ document.getElementById('play').addEventListener('click', function() {
     scoreLimit == 0
     ? document.getElementById('final-score').textContent = '100'
     : document.getElementById('final-score').textContent = scoreLimit;
-
-    //document.querySelector('.wrapper').style.filter = 'blur(0px)'; performance issues
 });
 
 newGame();
