@@ -2,13 +2,6 @@
 /************** G E N E R A L ****************/
 /*********************************************/
 
-/* TODO: make play button snazzy */
-/* TODO: wrapper display none, frosted glass effect on starting screen */
-
-/* color scheme:
-#199673;
-#5b3960;*/
-
 :root { 
     --primary-color: #5b3960;
     --secondary-color: #199673;
