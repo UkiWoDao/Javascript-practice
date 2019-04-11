@@ -1,4 +1,4 @@
 # Javascript-practice
-A dice game inspired by Jonas from Udemy
+Coding through courses and tutorials
 
 Feel free to do whatever you like with it :)
