@@ -29,6 +29,14 @@ var dataModule = (function(){
         percentage: -1
     };
 
+    var calculateTotal = function(type){
+        var sum = 0;
+        data.allItems[type].forEach(function(current){
+            sum += current.value;
+        });
+        data.totals[type] = sum;
+    }
+
     return {
         addItem: function(type, des, val){
             var newItem, ID;
@@ -51,6 +59,27 @@ var dataModule = (function(){
             data.allItems[type].push(newItem);
 
             return newItem;
+        },
+
+        calculateBudget: function(){
+            // 1. calculate budget
+            calculateTotal('exp');
+            calculateTotal('inc');
+
+            // 2. calculate budget
+            data.budget = data.totals.inc - data.totals.exp;
+
+            // 3. calculate expenses in percentages
+            data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+        },
+
+        getBudget: function(){
+            return {
+                budget: data.budget,
+                totalIncome: data.totals.inc,
+                totalExpenses: data.totals.exp,
+                percentage: data.percentage
+            };
         },
 
         testing: function(){
@@ -79,13 +108,16 @@ var interfaceModule = (function(){
         getInput: function(){
             return {
                 type: document.querySelector(DOM.inputType).value,
+
                 description: document.querySelector(DOM.inputDescription).value,
-                value: document.querySelector(DOM.inputValue).value
+
+                // convert input string to number
+                value: parseInt(document.querySelector(DOM.inputValue).value)
             };
         },
 
         addListItem: function(obj, type){
-            var html, element, newHtml;
+            var html, element, replacement;
             // create html string with placeholders
             if (type === 'inc'){
                 element = DOM.incomeContainer;
@@ -95,8 +127,8 @@ var interfaceModule = (function(){
                 html = '<div class="item clearfix" id="expense-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</ div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
 
-            // replace placeholder text with actual text
-            var replacement = html.replace(/!id!/, obj.id).replace(/!description!/, obj.description).replace(/!value!/, obj.value);
+            // my solution: replace placeholder text with actual text
+            replacement = html.replace(/!id!/, obj.id).replace(/!description!/, obj.description).replace(/!value!/, obj.value);
 
             // jonas' solution
             // newHtml = html.replace('!id!', obj.id);
@@ -106,6 +138,28 @@ var interfaceModule = (function(){
             // insert html text
             document.querySelector(element).insertAdjacentHTML('beforeend', replacement);
         },
+
+        // clear input fields
+        clearFields: function(){
+            var fields;
+           
+            fields = document.querySelectorAll(DOM.inputDescription + ', ' + DOM.inputValue)
+
+            // jonas' solution: fieldsArr = Array.prototype.slice.call(fields);
+
+            // mysolution: convert to array so we can loop
+            fieldsArr = Array.from(fields);
+
+            // loop through array and reset
+            fieldsArr.forEach(function(current){
+                current.value = '';
+            });
+
+            // focus the first input after clearing
+            fieldsArr[0].focus();  
+        },
+
+        
 
         // make DOM accessible to other modules
         getDOM: function(){
@@ -128,19 +182,41 @@ var globalModule = (function(dataMod, UIMod){
         });
     };
    
+    var updateBudget = function(){
+        // 1. calculate the budget
+        dataMod.calculateBudget();
+
+        // 2. return the budget
+        var budget = dataMod.getBudget();
+
+        // 3. display the budget
+    };
+
     var ctrlAddItem = function(){
         var input, newItem;
         // 1. get input
         input = UIMod.getInput();
         
-        // add item to dataMod
-        newItem = dataMod.addItem(input.type, input.description, input.value);
-        
-        // add item to UIMod
-        UIMod.addListItem(newItem, input.type);
-        
-        // calculate
-        // display
+        // ensure input fields arent empty
+        if (input.description.length !== 0 && !isNaN(input.value)){
+            // 2. add item to dataMod
+            newItem = dataMod.addItem(input.type, input.description, input.value);
+            
+            // 3. add item to UIMod
+            UIMod.addListItem(newItem, input.type);
+
+            // 4. clear input fields
+            UIMod.clearFields();
+
+            // 5. update budget
+            updateBudget();            
+        }
+
+
+
+        // 5. calculate
+
+        // 6. display
     };
 
     return {
