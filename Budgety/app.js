@@ -1,3 +1,6 @@
+// IDEA: make color more intense as the percentage increases
+// IDEA: add currency convertor
+
 // Data module for manipulating data
 var dataModule = (function(){
     class Expense {
@@ -35,7 +38,7 @@ var dataModule = (function(){
             sum += current.value;
         });
         data.totals[type] = sum;
-    }
+    };
 
     return {
         addItem: function(type, des, val){
@@ -55,12 +58,32 @@ var dataModule = (function(){
                 newItem = new Income(ID, des, val);
             }
 
-            // add to data array
             data.allItems[type].push(newItem);
 
             return newItem;
         },
 
+        deleteItem: function(type, id){
+            var ids, index;
+
+            // since id !== index of the item, data.allItems[type][id] doesn't work
+            // create new array with all item ids
+            ids = data.allItems[type].map(function(current){
+                return current.id;               
+            });
+            console.log(ids); 
+
+            // find array position of item 
+            index = ids.indexOf(id);
+            console.log(index);
+            
+
+            // check if id is in array, otherwise index is -1
+            if (index !== -1){
+                data.allItems[type].splice(index, 1);
+            }
+        },
+          
         calculateBudget: function(){
             // 1. calculate budget
             calculateTotal('exp');
@@ -70,7 +93,11 @@ var dataModule = (function(){
             data.budget = data.totals.inc - data.totals.exp;
 
             // 3. calculate expenses in percentages
-            data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+            if (data.totals.inc > 0){
+                data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+            } else {
+                data.percentage = -1;
+            }
         },
 
         getBudget: function(){
@@ -101,7 +128,8 @@ var interfaceModule = (function(){
         budgetLabel: '.budget__value',
         incomeLabel: '.budget__income--value',
         expensesLabel: '.budget__expenses--value',
-        percentageLabel: '.budget__expenses--percentage'
+        percentageLabel: '.budget__expenses--percentage',
+        container: '.container'
     };
 
     return {
@@ -121,10 +149,10 @@ var interfaceModule = (function(){
             // create html string with placeholders
             if (type === 'inc'){
                 element = DOM.incomeContainer;
-                html = '<div class="item clearfix" id="income-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                html = '<div class="item clearfix" id="inc-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             } else if (type === 'exp'){
                 element = DOM.expensesContainer;
-                html = '<div class="item clearfix" id="expense-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</ div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                html = '<div class="item clearfix" id="exp-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</ div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
 
             // my solution: replace placeholder text with actual text
@@ -139,8 +167,12 @@ var interfaceModule = (function(){
             document.querySelector(element).insertAdjacentHTML('beforeend', replacement);
         },
 
+        deleteListItem: function(){
+
+        },
+
         // clear input fields
-        clearFields: function(){
+        clearFields: function(obj, type){
             var fields;
            
             fields = document.querySelectorAll(DOM.inputDescription + ', ' + DOM.inputValue)
@@ -159,7 +191,18 @@ var interfaceModule = (function(){
             fieldsArr[0].focus();  
         },
 
-        
+        // display data in UI
+        displayBudget: function(obj){
+            document.querySelector(DOM.budgetLabel).textContent = obj.budget;
+            document.querySelector(DOM.incomeLabel).textContent = obj.totalIncome;
+            document.querySelector(DOM.expensesLabel).textContent = obj.totalExpenses;
+
+            if (obj.percentage > 0){
+                document.querySelector(DOM.percentageLabel).textContent = obj.percentage + '%';
+            } else {
+                document.querySelector(DOM.percentageLabel).textContent = '---';
+            }
+        },
 
         // make DOM accessible to other modules
         getDOM: function(){
@@ -180,6 +223,14 @@ var globalModule = (function(dataMod, UIMod){
                 ctrlAddItem();
             }
         });
+
+        // document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
+
+        document.querySelector(DOM.container).addEventListener('click', function(e){
+            if (e.target.classList.contains('ion-ios-close-outline')){
+                ctrlDeleteItem(e);
+            }
+        });
     };
    
     var updateBudget = function(){
@@ -190,6 +241,7 @@ var globalModule = (function(dataMod, UIMod){
         var budget = dataMod.getBudget();
 
         // 3. display the budget
+        UIMod.displayBudget(budget);
     };
 
     var ctrlAddItem = function(){
@@ -210,14 +262,30 @@ var globalModule = (function(dataMod, UIMod){
 
             // 5. update budget
             updateBudget();            
-        }
-
-
-
-        // 5. calculate
-
-        // 6. display
+        ;}
     };
+
+    var ctrlDeleteItem = function(e){
+        var itemID, splitID, type, ID;
+
+        // traversing not a problem if the inserted html is hardcoded / to be avoided otherwise
+        itemID = e.target.parentNode.parentNode.parentNode.parentNode.id;
+        console.log(itemID); 
+        
+        if (itemID){
+            // split returns an array of strings
+            splitID = itemID.split('-');
+            type = splitID[0];
+            ID = parseInt(splitID[1]);                      
+            
+            // 1. delete from data module
+            dataMod.deleteItem(type, ID);
+
+            // 2. delete from interface
+
+            // 3. update interface
+        }
+    }
 
     return {
         init: function(){
@@ -228,5 +296,3 @@ var globalModule = (function(dataMod, UIMod){
 })(dataModule, interfaceModule);
 
 globalModule.init();
-
-
