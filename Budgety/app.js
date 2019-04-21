@@ -1,5 +1,6 @@
 // IDEA: make color more intense as the percentage increases
 // IDEA: add currency convertor
+// IDEA: add debt
 
 // Data module for manipulating data
 var dataModule = (function(){
@@ -70,14 +71,11 @@ var dataModule = (function(){
             // create new array with all item ids
             ids = data.allItems[type].map(function(current){
                 return current.id;               
-            });
-            console.log(ids); 
+            }); 
 
             // find array position of item 
             index = ids.indexOf(id);
-            console.log(index);
             
-
             // check if id is in array, otherwise index is -1
             if (index !== -1){
                 data.allItems[type].splice(index, 1);
@@ -152,7 +150,7 @@ var interfaceModule = (function(){
                 html = '<div class="item clearfix" id="inc-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             } else if (type === 'exp'){
                 element = DOM.expensesContainer;
-                html = '<div class="item clearfix" id="exp-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</ div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                html = '<div class="item clearfix" id="exp-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
 
             // my solution: replace placeholder text with actual text
@@ -167,12 +165,13 @@ var interfaceModule = (function(){
             document.querySelector(element).insertAdjacentHTML('beforeend', replacement);
         },
 
-        deleteListItem: function(){
-
+        deleteListItem: function(elID){
+            let element = document.getElementById(elID);
+            element.parentNode.removeChild(element);
         },
 
         // clear input fields
-        clearFields: function(obj, type){
+        clearFields: function(){
             var fields;
            
             fields = document.querySelectorAll(DOM.inputDescription + ', ' + DOM.inputValue)
@@ -226,11 +225,7 @@ var globalModule = (function(dataMod, UIMod){
 
         // document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
 
-        document.querySelector(DOM.container).addEventListener('click', function(e){
-            if (e.target.classList.contains('ion-ios-close-outline')){
-                ctrlDeleteItem(e);
-            }
-        });
+        document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem)
     };
    
     var updateBudget = function(){
@@ -269,8 +264,7 @@ var globalModule = (function(dataMod, UIMod){
         var itemID, splitID, type, ID;
 
         // traversing not a problem if the inserted html is hardcoded / to be avoided otherwise
-        itemID = e.target.parentNode.parentNode.parentNode.parentNode.id;
-        console.log(itemID); 
+        itemID = e.target.parentNode.parentNode.parentNode.parentNode.id;          
         
         if (itemID){
             // split returns an array of strings
@@ -282,8 +276,10 @@ var globalModule = (function(dataMod, UIMod){
             dataMod.deleteItem(type, ID);
 
             // 2. delete from interface
+            UIMod.deleteListItem(itemID);
 
             // 3. update interface
+            updateBudget();
         }
     }
 
