@@ -9,8 +9,21 @@ var dataModule = (function(){
             this.id = id;
             this.description = description;
             this.value = value;
+            this.percentage = -1;
         }
     }
+
+    Expense.prototype.calcPercentage = function(totalIncome){
+        if (totalIncome > 0){
+            this.percentage = Math.round((this.value / totalIncome) * 100);
+        } else {
+            this.percentage = -1;
+        }
+    };
+
+    Expense.prototype.getPercentage = function(){
+        return this.percentage;
+    };
 
     class Income {
         constructor(id, description, value) {
@@ -98,6 +111,19 @@ var dataModule = (function(){
             }
         },
 
+        calculatePercentages: function(){
+            data.allItems.exp.forEach(function(current){
+                current.calcPercentage(data.totals.inc);
+            })
+        },
+
+        getPercentages: function(){
+            allPercentages = data.allItems.exp.map(function(current){
+                return current.getPercentage();
+            });
+            return allPercentages;
+        },
+
         getBudget: function(){
             return {
                 budget: data.budget,
@@ -127,7 +153,41 @@ var interfaceModule = (function(){
         incomeLabel: '.budget__income--value',
         expensesLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
-        container: '.container'
+        container: '.container',
+        itemPercentages: '.item__percentage',
+        monthLabel: '.budget__title--month'
+    };
+
+    // from this input e.g. 1000000 to this output format 1.000.000,00
+    var formatNumber = function(num, type){
+        var numSplit, int, dec, type;
+        // make number absolute 
+        num = Math.abs(num);
+
+        // add (2) decimal points
+        num = num.toFixed(2);
+
+        // divide string into int(eger) and dec(imal) arrays of strings
+        numSplit = num.split('.');
+        
+        // 25600
+        // insert comma after every 3 digits
+        int = numSplit[0];
+        if (int.length > 3){
+            int = int.substr(0, int.length - 3) + ',' + int.substr(int.length - 3, int.length);
+        }
+        
+        dec = numSplit[1];
+        
+        // sign relative to type
+        if (type === 'exp'){
+            sign = '-';
+        } else {
+            sign = '+';
+        }
+
+        // insert sign, concatenate and return
+        return sign + ' ' + int + '.' + dec;
     };
 
     return {
@@ -150,13 +210,13 @@ var interfaceModule = (function(){
                 html = '<div class="item clearfix" id="inc-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             } else if (type === 'exp'){
                 element = DOM.expensesContainer;
-                html = '<div class="item clearfix" id="exp-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                html = '<div class="item clearfix" id="exp-!id!"><div class="item__description">!description!</div><div class="right clearfix"><div class="item__value">!value!</div><div class="item__percentage">!21%!</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
 
-            // my solution: replace placeholder text with actual text
-            replacement = html.replace(/!id!/, obj.id).replace(/!description!/, obj.description).replace(/!value!/, obj.value);
+            // 1. solution: replace placeholder text with actual text
+            replacement = html.replace(/!id!/, obj.id).replace(/!description!/, obj.description).replace(/!value!/, formatNumber(obj.value, type));
 
-            // jonas' solution
+            // 2. solution:
             // newHtml = html.replace('!id!', obj.id);
             // newHtml = newHtml.replace('!description!', obj.description);
             // newHtml = newHtml.replace('!value!', obj.value);
@@ -175,11 +235,10 @@ var interfaceModule = (function(){
             var fields;
            
             fields = document.querySelectorAll(DOM.inputDescription + ', ' + DOM.inputValue)
-
-            // jonas' solution: fieldsArr = Array.prototype.slice.call(fields);
-
-            // mysolution: convert to array so we can loop
+          
+            // convert to array so we can loop
             fieldsArr = Array.from(fields);
+            // another way: fieldsArr = Array.prototype.slice.call(fields);
 
             // loop through array and reset
             fieldsArr.forEach(function(current){
@@ -192,9 +251,14 @@ var interfaceModule = (function(){
 
         // display data in UI
         displayBudget: function(obj){
-            document.querySelector(DOM.budgetLabel).textContent = obj.budget;
-            document.querySelector(DOM.incomeLabel).textContent = obj.totalIncome;
-            document.querySelector(DOM.expensesLabel).textContent = obj.totalExpenses;
+            if (obj.budget > 0){
+                type = 'inc';
+            } else {
+                type = 'exp';
+            }
+            document.querySelector(DOM.budgetLabel).textContent = formatNumber(obj.budget, type);
+            document.querySelector(DOM.incomeLabel).textContent = formatNumber(obj.totalIncome, 'inc');
+            document.querySelector(DOM.expensesLabel).textContent = formatNumber(obj.totalExpenses, 'exp');
 
             if (obj.percentage > 0){
                 document.querySelector(DOM.percentageLabel).textContent = obj.percentage + '%';
@@ -203,6 +267,39 @@ var interfaceModule = (function(){
             }
         },
 
+        displayPercentages: function(percentages){
+            var fields = document.querySelectorAll(DOM.itemPercentages);
+
+            var nodeListForEach = function(list, callback){
+                for (var i = 0; i < list.length; i++){
+                    callback(list[i], i);
+                }
+            };
+
+            nodeListForEach(fields, function(current, index){
+                if (percentages[index] > 0){
+                    current.textContent = percentages[index] + '%';
+                } else {
+                    current.textContent = '---';
+                }
+            });
+        },
+
+        displayMonth: function(){
+            var now, months, month, year;
+
+            // grab Date object
+            now = new Date();
+
+            // getMonth returns zero based index
+            month = now.getMonth();
+
+            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+            year = now.getFullYear();
+            document.querySelector(DOM.monthLabel).textContent = months[month] + ' ' + year;
+        }
+        ,
         // make DOM accessible to other modules
         getDOM: function(){
             return DOM;
@@ -228,6 +325,17 @@ var globalModule = (function(dataMod, UIMod){
         document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem)
     };
    
+    var updatePercentages = function(){
+        // 1. calculate percentages
+        dataMod.calculatePercentages();
+
+        // 2. grab percentages
+        var percentages =  dataMod.getPercentages();
+
+        // 3. display percentages in UI
+        UIMod.displayPercentages(percentages);        
+    };
+
     var updateBudget = function(){
         // 1. calculate the budget
         dataMod.calculateBudget();
@@ -256,7 +364,10 @@ var globalModule = (function(dataMod, UIMod){
             UIMod.clearFields();
 
             // 5. update budget
-            updateBudget();            
+            updateBudget();    
+            
+            // 6. update percentages
+            updatePercentages();
         ;}
     };
 
@@ -264,8 +375,7 @@ var globalModule = (function(dataMod, UIMod){
         var itemID, splitID, type, ID;
 
         // traversing not a problem if the inserted html is hardcoded / to be avoided otherwise
-        itemID = e.target.parentNode.parentNode.parentNode.parentNode.id;          
-        
+        itemID = e.target.parentNode.parentNode.parentNode.parentNode.id;                 
         if (itemID){
             // split returns an array of strings
             splitID = itemID.split('-');
@@ -280,12 +390,16 @@ var globalModule = (function(dataMod, UIMod){
 
             // 3. update interface
             updateBudget();
+
+            // 4. update percentages
+            updatePercentages();
         }
     }
 
     return {
         init: function(){
             setEventListeners();
+            UIMod.displayMonth();
             console.log('App running');
         }
     };
