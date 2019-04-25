@@ -4,6 +4,12 @@
 
 /* make expense and income colorless if empty */
 /* small animation when totals change */
+/* IDEA: backdrop filter on budget income and expense or a div that contains all of them */
+
+:root {
+    --income-color: #28B989;
+    --expense-color: #B92C28;
+}
 
 * {
     margin: 0;
@@ -24,6 +30,7 @@ body {
     position: relative;
     height: 100vh;
     font-weight: 400;
+    background-attachment: fixed;
 }
 
 .right { float: right; }
@@ -74,18 +81,29 @@ body {
 
 .budget__income {
     margin-bottom: 10px;
-    background-color: #28B9B5;
+    background-color: rgba(40, 185, 137, 0.8);
+}
+
+.budget__income::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    filter: blur(10px);
+    z-index: -1;
 }
 
 .budget__expenses {
-    background-color: #FF5049;
+    background-color: rgba(185, 40, 40, 0.8);
 }
 
 .budget__income--text,
 .budget__expenses--text {
     float: left;
     font-size: 13px;
-    color: #444;
+    color: #fff;
     margin-top: 2px;
 }
 
@@ -217,8 +235,13 @@ h2 {
     margin-bottom: 15px;
 }
 
-.icome__title { color: #28B9B5; }
-.expenses__title { color: #FF5049; }
+.income__title { 
+    color: var(--income-color); 
+}
+
+.expenses__title { 
+    color: var(--expense-color);
+}
 
 .item {
     padding: 13px;
@@ -251,13 +274,13 @@ h2 {
 
 .income .item__value,
 .income .item__delete--btn {
-    color: #28B9B5;
+    color: var(--income-color);
 }
 
 .expenses .item__value,
 .expenses .item__percentage,
 .expenses .item__delete--btn {
-    color: #FF5049;
+    color: var(--expense-color);
 }
 
 
